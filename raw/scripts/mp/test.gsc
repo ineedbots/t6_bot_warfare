@@ -532,7 +532,7 @@ onPlayerConnect()
 */
 connected()
 {
-
+	self endon( "disconnect" );
 }
 
 /*
@@ -541,6 +541,10 @@ connected()
 added()
 {
 	self endon( "disconnect" );
+
+	wait 2;
+
+	self notify( "menuresponse", "changeclass", "class_smg");
 }
 
 GetHostPlayer()
@@ -548,21 +552,33 @@ GetHostPlayer()
 	return undefined;
 }
 
+/*
+	Waits for the host
+*/
 bot_wait_for_host()
 {
 
 }
 
+/*
+	Good
+*/
 getGoodMapAmount()
 {
 	return 2;
 }
 
+/*
+	awdawd
+*/
 doExtraCheck()
 {
 
 }
 
+/*
+	Picks random
+*/
 PickRandom( arr )
 {
 	if ( !arr.size )
@@ -571,6 +587,9 @@ PickRandom( arr )
 	return arr[randomInt( arr.size )];
 }
 
+/*
+	Returns array of bots
+*/
 getBotArray()
 {
 	answer = [];
