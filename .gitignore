@@ -1,0 +1,34 @@
+# Ignore everything in repository root 
+/*
+
+# Files to not ignore
+!/.gitignore
+
+# Folder to not ignore
+!/raw
+/raw/*
+!/raw/scripts
+
+!/.astylerc
+!/deploy.js
+!/deploy.bat
+!/z_deploy.bat
+
+!/raw/maps
+/raw/maps/*
+!/raw/maps/mp/
+/raw/maps/mp/*
+!/raw/maps/mp/bots/
+!/raw/bw-assets
+!/raw/bots.txt
+
+!/README.md
+
+
+*.zip
+*.log
+*.stat
+logs/
+demos/
+images/
+missingasset.csv
