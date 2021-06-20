@@ -18,6 +18,12 @@ init()
 	if ( !getDvarInt( "bots_main" ) )
 		return;
 
+	if ( getDvar( "bots_main_GUIDs" ) == "" )
+		setDvar( "bots_main_GUIDs", "" ); //guids of players who will be given host powers, comma seperated
+
+	if ( getDvar( "bots_main_firstIsHost" ) == "" )
+		setDvar( "bots_main_firstIsHost", false ); //first play to connect is a host
+
 	if ( getDvar( "bots_main_waitForHostTime" ) == "" )
 		setDvar( "bots_main_waitForHostTime", 10.0 ); //how long to wait to wait for the host player
 
@@ -313,9 +319,9 @@ teamBots_loop()
 					if ( isDefined( player.pers["team"] ) && player maps\mp\_utility::is_bot() && ( player.pers["team"] != toTeam ) )
 					{
 						if ( toTeam == "allies" )
-							player thread [[level.allies]]();
+							player thread [[level.teammenu]]( "allies" );
 						else if ( toTeam == "axis" )
-							player thread [[level.axis]]();
+							player thread [[level.teammenu]]( "axis" );
 						else
 							player thread [[level.spectator]]();
 
@@ -339,7 +345,7 @@ teamBots_loop()
 				{
 					if ( axis > teamAmount )
 					{
-						player thread [[level.allies]]();
+						player thread [[level.teammenu]]( "allies" );
 						break;
 					}
 				}
@@ -347,12 +353,12 @@ teamBots_loop()
 				{
 					if ( axis < teamAmount )
 					{
-						player thread [[level.axis]]();
+						player thread [[level.teammenu]]( "axis" );
 						break;
 					}
 					else if ( player.pers["team"] != "allies" )
 					{
-						player thread [[level.allies]]();
+						player thread [[level.teammenu]]( "allies" );
 						break;
 					}
 				}
@@ -533,6 +539,66 @@ onPlayerConnect()
 connected()
 {
 	self endon( "disconnect" );
+
+	if ( !isDefined( self.pers["bot_host"] ) )
+		self thread doHostCheck();
+
+	if ( !self istestclient() )
+		return;
+
+	self thread teamWatch();
+	self thread classWatch();
+}
+
+/*
+	Makes sure the bot is on a team.
+*/
+teamWatch()
+{
+	self endon( "disconnect" );
+
+	for ( ;; )
+	{
+		while ( !isdefined( self.pers["team"] ) || !allowTeamChoice() )
+			wait .05;
+
+		wait 0.05;
+		self notify( "menuresponse", game["menu_team"], getDvar( "bots_team" ) );
+
+		while ( isdefined( self.pers["team"] ) )
+			wait .05;
+	}
+}
+
+/*
+	Selects a class for the bot.
+*/
+classWatch()
+{
+	self endon( "disconnect" );
+
+	for ( ;; )
+	{
+		while ( !isdefined( self.pers["team"] ) || !allowClassChoice() )
+			wait .05;
+
+		wait 0.5;
+
+		self notify( "menuresponse", game["menu_changeclass"], self chooseRandomClass() );
+
+		self.bot_change_class = true;
+
+		while ( isdefined( self.pers["team"] ) && isdefined( self.pers["class"] ) && isDefined( self.bot_change_class ) )
+			wait .05;
+	}
+}
+
+/*
+	Chooses random class
+*/
+chooseRandomClass()
+{
+	return PickRandom( self maps\mp\bots\_bot::bot_build_classes() );
 }
 
 /*
@@ -542,22 +608,218 @@ added()
 {
 	self endon( "disconnect" );
 
-	wait 2;
-
-	self notify( "menuresponse", "changeclass", "class_smg");
+	self thread doCustomRank();
 }
 
+/*
+	Gets the prestige
+*/
+bot_get_prestige()
+{
+	p_dvar = getDvarInt( "bots_loadout_prestige" );
+	p = 0;
+
+	if ( p_dvar == -1 )
+	{
+		for ( i = 0; i < level.players.size; i++ )
+		{
+			player = level.players[i];
+
+			if ( isDefined( player.team ) && !player maps\mp\_utility::is_bot() )
+				p = player.pers[ "prestige" ];
+
+			break;
+		}
+	}
+	else if ( p_dvar == -2 )
+	{
+		p = randomInt( 12 );
+	}
+	else
+	{
+		p = p_dvar;
+	}
+
+	return p;
+}
+
+/*
+	Bot custom ranks
+*/
+doCustomRank()
+{
+	self endon( "disconnect" );
+
+	if ( getDvarInt( "bots_loadout_rank" ) != -1 )
+		self.pers[ "bot_loadout" ] = true;
+
+	wait 0.25;
+
+	rank = self.pers[ "rank" ];
+
+	if ( getDvarInt( "bots_loadout_rank" ) != -1 )
+	{
+		if ( getDvarInt( "bots_loadout_rank" ) == 0 )
+			rank = randomInt( level.maxrank + 1 );
+		else
+			rank = getDvarInt( "bots_loadout_rank" );
+	}
+
+	self.pers[ "prestige" ] = bot_get_prestige();
+	self.pers[ "rank" ] = rank;
+	self.pers[ "rankxp" ] = maps\mp\gametypes\_rank::getrankinfominxp( rank );
+
+	self setRank( self.pers[ "rank" ], self.pers[ "prestige" ] );
+
+	self maps\mp\gametypes\_rank::syncxpstat();
+
+	if ( getDvarInt( "bots_loadout_rank" ) != -1 )
+	{
+		self botsetdefaultclass( 5, "class_assault" );
+		self botsetdefaultclass( 6, "class_smg" );
+		self botsetdefaultclass( 7, "class_lmg" );
+		self botsetdefaultclass( 8, "class_cqb" );
+		self botsetdefaultclass( 9, "class_sniper" );
+
+		max_allocation = 10;
+
+		for ( i = 1; i <= 3; i++ )
+		{
+			if ( self isitemlocked( maps\mp\gametypes\_rank::getitemindex( "feature_allocation_slot_" + i ) ) )
+			{
+				max_allocation--;
+			}
+		}
+
+		self maps\mp\bots\_bot_loadout::bot_construct_loadout( max_allocation );
+	}
+}
+
+/*
+	iw5
+*/
+allowClassChoice()
+{
+	return true;
+}
+
+/*
+	iw5
+*/
+allowTeamChoice()
+{
+	return true;
+}
+
+/*
+	Returns if player is the host
+*/
+is_host()
+{
+	return ( isDefined( self.pers["bot_host"] ) && self.pers["bot_host"] );
+}
+
+/*
+	Setups the host variable on the player
+*/
+doHostCheck()
+{
+	self.pers["bot_host"] = false;
+
+	if ( self istestclient() )
+		return;
+
+	result = false;
+
+	if ( getDvar( "bots_main_firstIsHost" ) != "0" )
+	{
+		printLn( "WARNING: bots_main_firstIsHost is enabled" );
+
+		if ( getDvar( "bots_main_firstIsHost" ) == "1" )
+		{
+			setDvar( "bots_main_firstIsHost", self getguid() );
+		}
+
+		if ( getDvar( "bots_main_firstIsHost" ) == self getguid() + "" )
+			result = true;
+	}
+
+	DvarGUID = getDvar( "bots_main_GUIDs" );
+
+	if ( DvarGUID != "" )
+	{
+		guids = strtok( DvarGUID, "," );
+
+		for ( i = 0; i < guids.size; i++ )
+		{
+			if ( self getguid() + "" == guids[i] )
+				result = true;
+		}
+	}
+
+	if ( !self isHost() && !result )
+		return;
+
+	self.pers["bot_host"] = true;
+}
+
+/*
+	Gets a player who is host
+*/
 GetHostPlayer()
 {
+	for ( i = 0; i < level.players.size; i++ )
+	{
+		player = level.players[i];
+
+		if ( player is_host() )
+			return player;
+	}
+
 	return undefined;
 }
 
 /*
-	Waits for the host
+    Waits for a host player
 */
 bot_wait_for_host()
 {
+	host = undefined;
 
+	while ( !isDefined( level ) || !isDefined( level.players ) )
+		wait 0.05;
+
+	for ( i = getDvarFloat( "bots_main_waitForHostTime" ); i > 0; i -= 0.05 )
+	{
+		host = GetHostPlayer();
+
+		if ( isDefined( host ) )
+			break;
+
+		wait 0.05;
+	}
+
+	if ( !isDefined( host ) )
+		return;
+
+	for ( i = getDvarFloat( "bots_main_waitForHostTime" ); i > 0; i -= 0.05 )
+	{
+		if ( IsDefined( host.pers[ "team" ] ) )
+			break;
+
+		wait 0.05;
+	}
+
+	if ( !IsDefined( host.pers[ "team" ] ) )
+		return;
+
+	for ( i = getDvarFloat( "bots_main_waitForHostTime" ); i > 0; i -= 0.05 )
+	{
+		if ( host.pers[ "team" ] == "allies" || host.pers[ "team" ] == "axis" )
+			break;
+
+		wait 0.05;
+	}
 }
 
 /*
