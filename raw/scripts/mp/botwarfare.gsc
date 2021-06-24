@@ -572,6 +572,22 @@ connected()
 
 	self thread teamWatch();
 	self thread classWatch();
+
+	self thread setPrestige();
+}
+
+/*
+	Set pres
+*/
+setPrestige()
+{
+	wait 0.05;
+
+	if (isDefined(self.pers[ "bot_prestige" ]))
+	{
+		self.pers[ "prestige" ] = self.pers[ "bot_prestige" ];
+		self setRank( self.pers[ "rank" ], self.pers[ "prestige" ] );
+	}
 }
 
 /*
@@ -633,7 +649,6 @@ added()
 	self endon( "disconnect" );
 
 	self thread doCustomRank();
-	self setdstat( "playerstatslist", "plevel", "StatValue", self bot_get_prestige() );
 }
 
 /*
@@ -690,10 +705,13 @@ doCustomRank()
 			rank = getDvarInt( "bots_loadout_rank" );
 	}
 
+	self.pers[ "bot_prestige" ] = bot_get_prestige();
+
+	self.pers[ "prestige" ] = self.pers[ "bot_prestige" ];
 	self.pers[ "rank" ] = rank;
 	self.pers[ "rankxp" ] = maps\mp\gametypes\_rank::getrankinfominxp( rank );
 
-	self setRank( self.pers[ "rank" ] );
+	self setRank( self.pers[ "rank" ], self.pers[ "prestige" ] );
 
 	self maps\mp\gametypes\_rank::syncxpstat();
 
