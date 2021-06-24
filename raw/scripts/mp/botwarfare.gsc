@@ -24,6 +24,9 @@ init()
 	if ( getDvar( "bots_main_firstIsHost" ) == "" )
 		setDvar( "bots_main_firstIsHost", false ); //first play to connect is a host
 
+	if ( getDvar( "bots_main_kickBotsAtEnd" ) == "" )
+		setDvar( "bots_main_kickBotsAtEnd", false ); //kicks the bots at game end (dedis hang with bots on map rotate)
+
 	if ( getDvar( "bots_main_waitForHostTime" ) == "" )
 		setDvar( "bots_main_waitForHostTime", 10.0 ); //how long to wait to wait for the host player
 
@@ -100,6 +103,16 @@ handleBots()
 		wait 0.05;
 
 	setDvar( "bots_manage_add", getBotArray().size );
+
+	if ( !getDvarInt( "bots_main_kickBotsAtEnd" ) )
+		return;
+
+	bots = getBotArray();
+
+	for ( i = 0; i < bots.size; i++ )
+	{
+		kick( bots[i] getEntityNumber() );
+	}
 }
 
 /*
@@ -516,6 +529,7 @@ add_bot()
 	if ( isdefined( bot ) )
 	{
 		bot.pers["isBot"] = true;
+		bot.pers["isBotWarfare"] = true;
 		bot thread added();
 	}
 }
@@ -545,6 +559,16 @@ connected()
 
 	if ( !self istestclient() )
 		return;
+
+	if ( !isDefined( self.pers["isBot"] ) )
+	{
+		self.pers["isBot"] = true;
+	}
+
+	if ( !isDefined( self.pers["isBotWarfare"] ) )
+	{
+		self.pers["isBotWarfare"] = true;
+	}
 
 	self thread teamWatch();
 	self thread classWatch();
