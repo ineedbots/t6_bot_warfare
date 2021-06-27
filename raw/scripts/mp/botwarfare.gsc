@@ -111,7 +111,10 @@ handleBots()
 
 	for ( i = 0; i < bots.size; i++ )
 	{
-		kick( bots[i] getEntityNumber() );
+		bot = bots[i];
+
+		if ( isDefined( bot ) )
+			kick( bot getEntityNumber() );
 	}
 }
 
@@ -124,7 +127,7 @@ diffBots()
 	{
 		wait 1.5;
 
-		bot_set_difficulty( maps\mp\_utility::getdvarintdefault( "bot_difficulty", 1 ) );
+		bot_set_difficulty( getdvarint( "bot_difficulty" ) );
 	}
 }
 
@@ -278,9 +281,9 @@ teamBots_loop()
 	{
 		player = level.players[i];
 
-		if ( isDefined( player.pers["team"] ) )
+		if ( isDefined( player ) && isDefined( player.team ) )
 		{
-			if ( player maps\mp\_utility::is_bot() )
+			if ( player is_bot() )
 			{
 				if ( player.pers["team"] == "allies" )
 					alliesbots++;
@@ -329,7 +332,7 @@ teamBots_loop()
 				{
 					player = level.players[i];
 
-					if ( isDefined( player.pers["team"] ) && player maps\mp\_utility::is_bot() && ( player.pers["team"] != toTeam ) )
+					if ( isDefined( player ) && isDefined( player.team ) && player is_bot() && ( player.pers["team"] != toTeam ) )
 					{
 						if ( toTeam == "allies" )
 							player thread [[level.teammenu]]( "allies" );
@@ -352,7 +355,7 @@ teamBots_loop()
 		{
 			player = level.players[i];
 
-			if ( isDefined( player.pers["team"] ) && player maps\mp\_utility::is_bot() )
+			if ( isDefined( player ) && isDefined( player.team ) && player is_bot() )
 			{
 				if ( player.pers["team"] == "axis" )
 				{
@@ -430,14 +433,17 @@ addBots_loop()
 	{
 		player = level.players[i];
 
-		if ( player maps\mp\_utility::is_bot() )
-			bots++;
-		else if ( !isDefined( player.pers["team"] ) )
-			spec++;
-		else if ( player.pers["team"] != "axis" && player.pers["team"] != "allies" ) // dude this compiler is kekware
-			spec++;
-		else
-			players++;
+		if ( isDefined( player ) )
+		{
+			if ( player is_bot() )
+				bots++;
+			else if ( !isDefined( player.team ) )
+				spec++;
+			else if ( player.pers["team"] != "axis" && player.pers["team"] != "allies" ) // dude this compiler is kekware
+				spec++;
+			else
+				players++;
+		}
 	}
 
 	if ( fillMode == 4 )
@@ -451,7 +457,7 @@ addBots_loop()
 		{
 			player = level.players[i];
 
-			if ( !player maps\mp\_utility::is_bot() && isDefined( player.pers["team"] ) )
+			if ( isDefined( player ) && isDefined( player.team ) && !player is_bot() )
 			{
 				if ( player.pers["team"] == "axis" )
 					axisplayers++;
@@ -554,7 +560,7 @@ connected()
 {
 	self endon( "disconnect" );
 
-	if ( !isDefined( self.pers["bot_host"] ) )
+	if ( !isDefined( self.pers ) || !isDefined( self.pers["bot_host"] ) )
 		self thread doHostCheck();
 
 	if ( !self istestclient() )
@@ -583,7 +589,7 @@ setPrestige()
 {
 	wait 0.05;
 
-	if (isDefined(self.pers[ "bot_prestige" ]))
+	if ( isDefined( self.pers[ "bot_prestige" ] ) )
 	{
 		self.pers[ "prestige" ] = self.pers[ "bot_prestige" ];
 		self setRank( self.pers[ "rank" ], self.pers[ "prestige" ] );
@@ -599,13 +605,13 @@ teamWatch()
 
 	for ( ;; )
 	{
-		while ( !isdefined( self.pers["team"] ) || !allowTeamChoice() )
+		while ( !isdefined( self.team ) || !allowTeamChoice() )
 			wait .05;
 
 		wait 0.05;
 		self notify( "menuresponse", game["menu_team"], getDvar( "bots_team" ) );
 
-		while ( isdefined( self.pers["team"] ) )
+		while ( isdefined( self.team ) )
 			wait .05;
 	}
 }
@@ -619,7 +625,7 @@ classWatch()
 
 	for ( ;; )
 	{
-		while ( !isdefined( self.pers["team"] ) || !allowClassChoice() )
+		while ( !isdefined( self.team ) || !allowClassChoice() )
 			wait .05;
 
 		wait 0.5;
@@ -628,7 +634,7 @@ classWatch()
 
 		self.bot_change_class = true;
 
-		while ( isdefined( self.pers["team"] ) && isdefined( self.pers["class"] ) && isDefined( self.bot_change_class ) )
+		while ( isdefined( self.team ) && isdefined( self.class ) && isDefined( self.bot_change_class ) )
 			wait .05;
 	}
 }
@@ -665,7 +671,7 @@ bot_get_prestige()
 		{
 			player = level.players[i];
 
-			if ( isDefined( player.team ) && !player maps\mp\_utility::is_bot() )
+			if ( isDefined( player ) && isDefined( player.team ) && !player is_bot() )
 				p = player.pers[ "prestige" ];
 
 			break;
@@ -723,17 +729,7 @@ doCustomRank()
 		self botsetdefaultclass( 8, "class_cqb" );
 		self botsetdefaultclass( 9, "class_sniper" );
 
-		max_allocation = 10;
-
-		for ( i = 1; i <= 3; i++ )
-		{
-			if ( self isitemlocked( maps\mp\gametypes\_rank::getitemindex( "feature_allocation_slot_" + i ) ) )
-			{
-				max_allocation--;
-			}
-		}
-
-		self maps\mp\bots\_bot_loadout::bot_construct_loadout( max_allocation );
+		self maps\mp\bots\_bot_loadout::bot_construct_loadout( 10 );
 	}
 }
 
@@ -758,6 +754,9 @@ allowTeamChoice()
 */
 is_host()
 {
+	if ( !isDefined( self ) || !isDefined( self.pers ) )
+		return false;
+
 	return ( isDefined( self.pers["bot_host"] ) && self.pers["bot_host"] );
 }
 
@@ -814,7 +813,7 @@ GetHostPlayer()
 	{
 		player = level.players[i];
 
-		if ( player is_host() )
+		if ( isDefined( player ) && player is_host() )
 			return player;
 	}
 
@@ -846,18 +845,18 @@ bot_wait_for_host()
 
 	for ( i = getDvarFloat( "bots_main_waitForHostTime" ); i > 0; i -= 0.05 )
 	{
-		if ( IsDefined( host.pers[ "team" ] ) )
+		if ( IsDefined( host.team ) )
 			break;
 
 		wait 0.05;
 	}
 
-	if ( !IsDefined( host.pers[ "team" ] ) )
+	if ( !IsDefined( host.team ) )
 		return;
 
 	for ( i = getDvarFloat( "bots_main_waitForHostTime" ); i > 0; i -= 0.05 )
 	{
-		if ( host.pers[ "team" ] == "allies" || host.pers[ "team" ] == "axis" )
+		if ( ( host.pers[ "team" ] == "allies" ) || ( host.pers[ "team" ] == "axis" ) )
 			break;
 
 		wait 0.05;
@@ -900,9 +899,34 @@ getBotArray()
 
 	for ( i = 0; i < level.players.size; i++ )
 	{
-		if ( level.players[i] maps\mp\_utility::is_bot() )
-			answer[answer.size] = level.players[i];
+		player = level.players[i];
+
+		if ( isDefined( player ) && isDefined( player.team ) && player is_bot() )
+			answer[answer.size] = player;
 	}
 
 	return answer;
+}
+
+/*
+	Is bot
+*/
+is_bot()
+{
+	if ( !isDefined( self ) || !isPlayer( self ) )
+		return false;
+
+	if ( !isDefined( self.pers ) || !isDefined( self.team ) )
+		return false;
+
+	if ( isDefined( self.pers["isBot"] ) && self.pers["isBot"] )
+		return true;
+
+	if ( isDefined( self.pers["isBotWarfare"] ) && self.pers["isBotWarfare"] )
+		return true;
+
+	if ( self istestclient() )
+		return true;
+
+	return false;
 }
