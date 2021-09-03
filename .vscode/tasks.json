@@ -1,0 +1,20 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compile current GSC File",
+            "type": "shell",
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "command": "${workspaceRoot}/.vscode/Compiler.exe",
+            "args": [
+                "\"${fileBasename}\""
+            ],
+            "problemMatcher": [],
+            "isBackground": true
+        }
+    ]
+}
