@@ -26,6 +26,11 @@
 
 !/README.md
 
+!/main
+/main/*
+!/main/dedicated.cfg
+!/z_server.bat
+
 
 *.zip
 *.log
