@@ -52,6 +52,9 @@ init()
 	if ( getDvar( "bots_manage_fill_kick" ) == "" )
 		setDvar( "bots_manage_fill_kick", false ); //kick bots if too many
 
+	if ( getDvar( "bots_skill" ) == "" )
+		setDvar( "bots_skill", getDvarInt( "bot_difficulty" ) );
+
 	if ( getDvar( "bots_team" ) == "" )
 		setDvar( "bots_team", "autoassign" ); //which team for bots to join
 
@@ -134,7 +137,7 @@ diffBots()
 	{
 		wait 1.5;
 
-		bot_set_difficulty( getdvarint( "bot_difficulty" ) );
+		bot_set_difficulty( getdvarint( "bots_skill" ) );
 	}
 }
 
@@ -267,6 +270,8 @@ bot_set_difficulty( difficulty )
 		setdvar( "bot_PitchUp", "0" );
 		setdvar( "bot_PitchDown", "0" );
 	}
+
+	setDvar( "bot_difficulty", difficulty );
 }
 
 /*
