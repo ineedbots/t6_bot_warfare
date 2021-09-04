@@ -1109,7 +1109,8 @@ bot_sd_defender( zone, isplanted ) //checked partially changed to match cerberus
 			}
 		}
 	}
-	else if ( self atgoal( "sd_defend" ) || self bot_need_to_defuse() )
+
+	if ( self atgoal( "sd_defend" ) || self bot_need_to_defuse() )
 	{
 		bot_sd_defender_think( zone );
 
