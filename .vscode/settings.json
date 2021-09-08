@@ -10,5 +10,19 @@
         "Compile current GSC File": [
             "*.gsc"
         ]
-    }
+    },
+    "Lua.diagnostics.globals": [
+        "InheritFrom",
+        "CoD",
+        "LUI",
+        "Dvar",
+        "Engine",
+        "UIExpression",
+        "RegisterMaterial",
+        "GetTextDimensions",
+        "setstencil",
+        "HUD_IngameMenuClosed",
+        "HUD_IsFFA",
+        "HideGlobe"
+    ]
 }

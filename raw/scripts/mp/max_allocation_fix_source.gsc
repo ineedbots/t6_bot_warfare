@@ -16,6 +16,8 @@ on_player_connect()
 
 check_player_classes()
 {
+	self endon( "disconnect" );
+
 	for ( class_num = 0; class_num < 10; class_num++ )
 	{
 		allocationSpent = self GetLoadoutAllocation( class_num );
@@ -27,7 +29,7 @@ check_player_classes()
 			logline1 = "Player: " + self.name + " XUID: " + self getXUID() + " had too many items in their class.";
 			print( logline1 );
 			kick( self getEntityNumber() );
-			break;
+			return;
 		}
 	}
 }
