@@ -590,8 +590,29 @@ connected()
 
 	self thread teamWatch();
 	self thread classWatch();
+	self thread onBotSpawned();
 
 	self thread setPrestige();
+}
+
+/*
+	When the bot spawns
+*/
+onBotSpawned()
+{
+	self endon( "disconnect" );
+
+	for ( ;; )
+	{
+		self waittill( "spawned_player" );
+
+		waittillframeend;
+
+		self.bot_first_spawn = undefined;
+
+		if ( randomInt( 100 ) < 2 )
+			self.bot_change_class = undefined;
+	}
 }
 
 /*
@@ -656,6 +677,17 @@ classWatch()
 */
 chooseRandomClass()
 {
+	if ( level.disablecac )
+	{
+		classes = [];
+		classes[classes.size] = "class_assault";
+		classes[classes.size] = "class_smg";
+		classes[classes.size] = "class_lmg";
+		classes[classes.size] = "class_cqb";
+		classes[classes.size] = "class_sniper";
+		return PickRandom( classes );
+	}
+
 	return PickRandom( self maps\mp\bots\_bot::bot_build_classes() );
 }
 
