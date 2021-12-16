@@ -103,7 +103,9 @@ trackplayedtime()
 	self.timePlayed["alive"] = 0;
 
 
-	if ( !isdefined( self.timePlayed["total"] ) || !( ( level.gameType == "twar" ) && ( 0 < game["roundsplayed"] ) && ( 0 < self.timeplayed["total"] ) ) )
+	if ( !isdefined( self.timePlayed["total"] ) )
+		self.timePlayed["total"] = 0;
+	else if ( ( level.gameType == "twar" ) && ( 0 < game["roundsplayed"] ) && ( 0 < self.timeplayed["total"] ) )
 		self.timePlayed["total"] = 0;
 
 	while ( level.inprematchperiod )
@@ -235,8 +237,6 @@ updateteambalancedvar()
 
 updateTeamBalance()
 {
-	level.teamLimit = level.maxclients / 2;
-
 	level thread updateTeamBalanceDvar();
 
 	wait .15;
