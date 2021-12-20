@@ -34,6 +34,9 @@
 !/raw/bw-assets
 !/raw/bots.txt
 !/raw/maps/mp/teams/
+/raw/maps/mp/teams/*
+!/raw/maps/mp/teams/_teams-src.gsc
+!/raw/maps/mp/teams/_teams.gsc
 
 !/README.md
 
