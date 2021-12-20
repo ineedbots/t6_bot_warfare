@@ -11,6 +11,15 @@
 !/raw
 /raw/*
 !/raw/scripts
+/raw/scripts/*
+!/raw/scripts/mp
+/raw/scripts/mp/*
+!/raw/scripts/mp/botwarfare-compiled.gsc
+!/raw/scripts/mp/botwarfare.gsc
+!/raw/scripts/mp/max_allocation_fix_source-compiled.gsc
+!/raw/scripts/mp/max_allocation_fix_source.gsc
+!/raw/scripts/mp/spectatorKick-compiled.gsc
+!/raw/scripts/mp/spectatorKick.gsc
 
 !/.astylerc
 !/deploy.js

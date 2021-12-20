@@ -7,6 +7,13 @@
             "label": "Compile current GSC File",
             "type": "shell",
             "options": {
+								"shell": {
+									"executable": "cmd.exe",
+									"args": [
+										"/d",
+										"/c"
+									]
+								},
                 "cwd": "${fileDirname}"
             },
             "command": "${workspaceRoot}/.vscode/Compiler.exe",
@@ -14,7 +21,7 @@
                 "\"${fileBasename}\""
             ],
             "problemMatcher": [],
-            "isBackground": true
+            "isBackground": true,
         }
     ]
 }
