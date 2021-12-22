@@ -1,35 +1,31 @@
 {
-    "astyle.astylerc": "${workspaceRoot}/.astylerc",
-    "astyle.additional_languages": [
-        "gsc"
-    ],
-		"[gsc]": {
-			"editor.defaultFormatter": "chiehyu.vscode-astyle",
-		},
-		"editor.quickSuggestions": {
-			"other": true,
-			"comments": true,
-			"strings": true
-		},
-		"vscode-codscript.use_builtin_completionItems": false,
+	"astyle.astylerc": "${workspaceRoot}/.astylerc",
+	"astyle.additional_languages": ["gsc"],
+	"[gsc]": {
+		"editor.defaultFormatter": "chiehyu.vscode-astyle"
+	},
+	"editor.quickSuggestions": {
+		"other": true,
+		"comments": true,
+		"strings": true
+	},
+	"vscode-codscript.use_builtin_completionItems": false,
 
-    "triggerTaskOnSave.tasks": {
-        "Compile current GSC File": [
-            "*.gsc"
-        ]
-    },
-    "Lua.diagnostics.globals": [
-        "InheritFrom",
-        "CoD",
-        "LUI",
-        "Dvar",
-        "Engine",
-        "UIExpression",
-        "RegisterMaterial",
-        "GetTextDimensions",
-        "setstencil",
-        "HUD_IngameMenuClosed",
-        "HUD_IsFFA",
-        "HideGlobe"
-    ]
+	"triggerTaskOnSave.tasks": {
+		"Compile current GSC File": ["*.gsc"]
+	},
+	"Lua.diagnostics.globals": [
+		"InheritFrom",
+		"CoD",
+		"LUI",
+		"Dvar",
+		"Engine",
+		"UIExpression",
+		"RegisterMaterial",
+		"GetTextDimensions",
+		"setstencil",
+		"HUD_IngameMenuClosed",
+		"HUD_IsFFA",
+		"HideGlobe"
+	]
 }
