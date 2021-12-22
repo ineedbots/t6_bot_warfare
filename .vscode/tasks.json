@@ -9,13 +9,11 @@
 			"options": {
 				"shell": {
 					"executable": "cmd.exe",
-					"args": ["/d", "/c"]
+					"args": ["/c"]
 				},
 				"cwd": "${fileDirname}"
 			},
-			"command": "${workspaceRoot}/.vscode/Compiler.exe",
-			"args": ["\"${fileBasename}\""],
-			"problemMatcher": [],
+			"command": "\"\"${workspaceRoot}\\.vscode\\Compiler.exe\" \"${fileBasename}\"\"",
 			"isBackground": true
 		}
 	]
