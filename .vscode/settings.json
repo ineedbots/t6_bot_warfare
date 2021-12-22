@@ -3,8 +3,15 @@
     "astyle.additional_languages": [
         "gsc"
     ],
-    "editor.defaultFormatter": "chiehyu.vscode-astyle",
-    "editor.formatOnSave": true,
+		"[gsc]": {
+			"editor.defaultFormatter": "chiehyu.vscode-astyle",
+		},
+		"editor.quickSuggestions": {
+			"other": true,
+			"comments": true,
+			"strings": true
+		},
+		"vscode-codscript.use_builtin_completionItems": false,
 
     "triggerTaskOnSave.tasks": {
         "Compile current GSC File": [
