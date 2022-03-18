@@ -1,7 +1,7 @@
-#include maps/mp/gametypes/_spectating;
-#include maps/mp/gametypes/_globallogic_ui;
-#include maps/mp/gametypes/_persistence;
-#include maps/mp/_utility;
+#include maps\mp\gametypes\_spectating;
+#include maps\mp\gametypes\_globallogic_ui;
+#include maps\mp\gametypes\_persistence;
+#include maps\mp\_utility;
 
 init()
 {
