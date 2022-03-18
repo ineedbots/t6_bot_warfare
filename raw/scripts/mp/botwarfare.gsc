@@ -5,12 +5,12 @@
 	The entry point and manager of the bots.
 */
 
-#include maps/mp/gametypes/_globallogic_utils;
-#include maps/mp/bots/_bot_combat;
-#include maps/mp/bots/_bot;
-#include maps/mp/gametypes/_gameobjects;
-#include maps/mp/_utility;
-#include common_scripts/utility;
+#include maps\mp\gametypes\_globallogic_utils;
+#include maps\mp\bots\_bot_combat;
+#include maps\mp\bots\_bot;
+#include maps\mp\gametypes\_gameobjects;
+#include maps\mp\_utility;
+#include common_scripts\utility;
 
 /*
 	Entry point to the bots
