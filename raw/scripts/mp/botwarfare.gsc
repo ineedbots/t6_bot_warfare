@@ -272,6 +272,8 @@ bot_set_difficulty( difficulty )
 	}
 
 	setDvar( "bot_difficulty", difficulty );
+	level.bot_difficulty = undefined;
+	level maps\mp\bots\_bot::bot_get_difficulty();
 }
 
 /*
