@@ -983,6 +983,12 @@ is_bot()
 
 bot_sd_think() //checked changed to match cerberus output
 {
+	if ( !isDefined( self.bot.patrol_update ) )
+	{
+		self.bot.patrol_update = 0;
+		self.bot.lookat_update = 0;
+	}
+
 	foreach ( zone in level.bombzones )
 	{
 		if ( !isDefined( zone.nearest_node ) )
@@ -1073,7 +1079,7 @@ bot_sd_attacker() //checked changed to match cerberus output
 
 			return;
 		}
-		else if ( getTime() > self.bot[ "patrol_update" ] )
+		else if ( getTime() > self.bot.patrol_update )
 		{
 			frac = sd_get_time_frac();
 
@@ -1095,7 +1101,7 @@ bot_sd_attacker() //checked changed to match cerberus output
 				}
 			}
 
-			self.bot[ "patrol_update" ] = getTime() + randomintrange( 2500, 5000 );
+			self.bot.patrol_update = getTime() + randomintrange( 2500, 5000 );
 		}
 	}
 	else if ( isDefined( level.sdbomb.carrier ) && !isplayer( level.sdbomb.carrier ) )
@@ -1172,7 +1178,7 @@ bot_sd_defender( zone, isplanted ) //checked partially changed to match cerberus
 
 	if ( self hasgoal( "sd_defend" ) )
 	{
-		self.bot[ "patrol_update" ] = getTime() + randomintrange( 2500, 5000 );
+		self.bot.patrol_update = getTime() + randomintrange( 2500, 5000 );
 		return;
 	}
 
@@ -1308,7 +1314,7 @@ bot_sd_defender_think( zone ) //checked matches cerberus output
 		return;
 	}
 
-	if ( getTime() > self.bot[ "patrol_update" ] )
+	if ( getTime() > self.bot.patrol_update )
 	{
 		if ( cointoss() )
 		{
@@ -1317,7 +1323,7 @@ bot_sd_defender_think( zone ) //checked matches cerberus output
 			return;
 		}
 
-		self.bot[ "patrol_update" ] = getTime() + randomintrange( 2500, 5000 );
+		self.bot.patrol_update = getTime() + randomintrange( 2500, 5000 );
 	}
 
 	if ( self hasgoal( "enemy_patrol" ) )
@@ -1333,7 +1339,7 @@ bot_sd_defender_think( zone ) //checked matches cerberus output
 		}
 	}
 
-	if ( getTime() > self.bot[ "lookat_update" ] )
+	if ( getTime() > self.bot.lookat_update )
 	{
 		origin = self bot_get_look_at();
 		z = 20;
@@ -1344,7 +1350,7 @@ bot_sd_defender_think( zone ) //checked matches cerberus output
 		}
 
 		self lookat( origin + ( 0, 0, z ) );
-		self.bot[ "lookat_update" ] = getTime() + randomintrange( 1500, 3000 );
+		self.bot.lookat_update = getTime() + randomintrange( 1500, 3000 );
 
 		if ( distancesquared( origin, self.origin ) > 65536 )
 		{
