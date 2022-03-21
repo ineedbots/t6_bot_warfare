@@ -607,13 +607,11 @@ onBotSpawned()
 {
 	self endon( "disconnect" );
 
-	self botClearOverrides();
-
 	for ( ;; )
 	{
 		self waittill( "spawned_player" );
 
-		self botClearOverrides();
+		self thread watch_for_override_stuff();
 
 		waittillframeend;
 
@@ -621,8 +619,6 @@ onBotSpawned()
 
 		if ( randomInt( 100 ) < 2 )
 			self.bot_change_class = undefined;
-
-		self thread watch_for_override_stuff();
 	}
 }
 
@@ -636,9 +632,10 @@ getConeDot( to, from, dir )
 	return vectordot( dirToTarget, forward );
 }
 
-botMovementOverride(a, b, c){}
-botStanceOverride(a){}
-botJumpOverride(a){}
+botMovementOverride(a, b){}
+botClearMovementOverride(){}
+botClearButtonOverride(a){}
+botButtonOverride(a, b){}
 botClearOverrides(){}
 
 /*
@@ -648,6 +645,8 @@ watch_for_override_stuff()
 {
 	self endon( "disconnect" );
 	self endon( "death" );
+
+	self botClearOverrides();
 
 	NEAR_DIST = 80;
 	LONG_DIST = 1000;
@@ -686,13 +685,13 @@ watch_for_override_stuff()
 					last_jump_time = time;
 
 					// drop shot
-					self botMovementOverride( true, 0, 0 );
-					self botStanceOverride( 1 );
+					self botMovementOverride( 0, 0 );
+					self botButtonOverride( "stance", "prone" );
 
 					wait 1.5;
 
-					self botMovementOverride( false );
-					self botStanceOverride( 0 );
+					self botClearMovementOverride();
+					self botClearButtonOverride( "stance" );
 				}
 			}
 			else
@@ -700,9 +699,9 @@ watch_for_override_stuff()
 				last_jump_time = time;
 
 				// jump shot
-				self botJumpOverride( 2 );
+				self botButtonOverride( "jump", true );
 				wait 0.1;
-				self botJumpOverride( 0 );
+				self botClearButtonOverride( "jump" );
 			}
 		}
 
