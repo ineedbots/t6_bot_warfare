@@ -79,6 +79,9 @@ init()
 	if ( getDvar( "bots_play_aim" ) == "" )
 		setDvar( "bots_play_aim", true );
 
+	if ( getDvar( "bots_play_jumpdrop" ) == "" ) //bots jump and dropshot
+		setDvar( "bots_play_jumpdrop", true );
+
 	if ( !isDefined( game["botWarfare"] ) )
 		game["botWarfare"] = true;
 
@@ -604,9 +607,13 @@ onBotSpawned()
 {
 	self endon( "disconnect" );
 
+	self botClearOverrides();
+
 	for ( ;; )
 	{
 		self waittill( "spawned_player" );
+
+		self botClearOverrides();
 
 		waittillframeend;
 
@@ -614,6 +621,88 @@ onBotSpawned()
 
 		if ( randomInt( 100 ) < 2 )
 			self.bot_change_class = undefined;
+
+		self thread watch_for_override_stuff();
+	}
+}
+
+/*
+	Returns the cone dot (like fov, or distance from the center of our screen).
+*/
+getConeDot( to, from, dir )
+{
+	dirToTarget = VectorNormalize( to - from );
+	forward = AnglesToForward( dir );
+	return vectordot( dirToTarget, forward );
+}
+
+/*
+	custom movement stuff
+*/
+watch_for_override_stuff()
+{
+	self endon( "disconnect" );
+	self endon( "death" );
+
+	NEAR_DIST = 80;
+	LONG_DIST = 1000;
+	SPAM_JUMP_TIME = 5000;
+
+	diff = level maps\mp\bots\_bot::bot_get_difficulty();
+	chance = 0;
+
+	if ( diff == "normal" )
+		chance = 25;
+	else if ( diff == "hard" )
+		chance = 50;
+	else if ( diff == "fu" )
+		chance = 80;
+
+	last_jump_time = 0;
+
+	if ( !getDvarInt( "bots_play_jumpdrop" ) )
+		return;
+
+	for ( ;; )
+	{
+		while ( !self maps\mp\bots\_bot_combat::threat_is_player() )
+			wait 0.05;
+
+		threat = self.bot.threat.entity;
+		dist = Distance( threat.origin, self.origin );
+		time = GetTime();
+
+		if ( ( dist > NEAR_DIST ) && ( dist < LONG_DIST ) && ( randomInt( 100 ) < chance ) && ( ( time - last_jump_time ) > SPAM_JUMP_TIME ) )
+		{
+			if ( randomInt( 2 ) )
+			{
+				if ( ( getConeDot( threat.origin, self.origin, self getPlayerAngles() ) > 0.8 ) && ( dist > ( NEAR_DIST * 2 ) ) )
+				{
+					last_jump_time = time;
+
+					// drop shot
+					self botMovementOverride( true, 0, 0 );
+					self botStanceOverride( 1 );
+
+					wait 1.5;
+
+					self botMovementOverride( false );
+					self botStanceOverride( 0 );
+				}
+			}
+			else
+			{
+				last_jump_time = time;
+
+				// jump shot
+				self botJumpOverride( 2 );
+				wait 0.1;
+				self botJumpOverride( 0 );
+			}
+		}
+
+		while ( self maps\mp\bots\_bot_combat::threat_is_player() && ( threat == self.bot.threat.entity ) )
+			wait 0.05;
 	}
 }
 
