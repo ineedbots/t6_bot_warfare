@@ -20,6 +20,7 @@
 !/raw/scripts/mp/max_allocation_fix_source.gsc
 !/raw/scripts/mp/spectatorKick-compiled.gsc
 !/raw/scripts/mp/spectatorKick.gsc
+!/raw/bots/
 
 !/.astylerc
 !/deploy.js
