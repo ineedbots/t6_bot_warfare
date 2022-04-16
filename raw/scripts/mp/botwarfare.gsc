@@ -226,6 +226,9 @@ bot_set_difficulty( difficulty )
 	}
 	else
 	{
+		if ( difficulty != 1 )
+			return;
+
 		setdvar( "bot_MinDeathTime", "500" );
 		setdvar( "bot_MaxDeathTime", "1000" );
 		setdvar( "bot_MinFireTime", "600" );
@@ -632,11 +635,11 @@ getConeDot( to, from, dir )
 	return vectordot( dirToTarget, forward );
 }
 
-botMovementOverride(a, b){}
-botClearMovementOverride(){}
-botClearButtonOverride(a){}
-botButtonOverride(a, b){}
-botClearOverrides(){}
+botMovementOverride( a, b ) {}
+botClearMovementOverride() {}
+botClearButtonOverride( a ) {}
+botButtonOverride( a, b ) {}
+botClearOverrides() {}
 
 /*
 	custom movement stuff
