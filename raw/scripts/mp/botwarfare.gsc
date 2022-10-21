@@ -594,13 +594,14 @@ connected()
 	if ( !isDefined( self.pers["isBotWarfare"] ) )
 	{
 		self.pers["isBotWarfare"] = true;
+		self thread added();
 	}
 
 	self thread teamWatch();
 	self thread classWatch();
 	self thread onBotSpawned();
 
-	self thread setPrestige();
+	self thread setRanks();
 }
 
 /*
@@ -716,15 +717,37 @@ watch_for_override_stuff()
 /*
 	Set pres
 */
-setPrestige()
+setRanks()
 {
+	self endon( "disconnect" );
+
 	wait 0.05;
 
-	if ( isDefined( self.pers[ "bot_prestige" ] ) )
-	{
-		self.pers[ "prestige" ] = self.pers[ "bot_prestige" ];
-		self setRank( self.pers[ "rank" ], self.pers[ "prestige" ] );
-	}
+	self setCustomRanks();
+
+	if ( !level.gameEnded )
+		level waittill( "game_ended" );
+
+	self.pers[ "bot_rankxp" ] = self.pers[ "rankxp" ];
+}
+
+/*
+	Sets the rank
+*/
+setCustomRanks()
+{
+	if ( !isDefined( self.pers[ "bot_prestige" ] ) )
+		return;
+
+	self.pers[ "prestige" ] = self.pers[ "bot_prestige" ];
+	self.pers[ "plevel" ] = self.pers[ "bot_prestige" ];
+
+	self.pers[ "rankxp" ] = self.pers[ "bot_rankxp" ];
+	self.pers[ "rank" ] = self maps\mp\gametypes\_rank::getRankForXp( self.pers[ "rankxp" ] );
+
+	self setRank( self.pers[ "rank" ], self.pers[ "prestige" ] );
+
+	self maps\mp\gametypes\_rank::syncxpstat();
 }
 
 /*
@@ -739,8 +762,11 @@ teamWatch()
 		while ( !isdefined( self.team ) || !allowTeamChoice() )
 			wait .05;
 
-		wait 0.05;
-		self notify( "menuresponse", game["menu_team"], getDvar( "bots_team" ) );
+		wait 0.1;
+
+		// multiteam?
+		if ( self.team != "axis" && self.team != "allies" )
+			self notify( "menuresponse", game["menu_team"], getDvar( "bots_team" ) );
 
 		while ( isdefined( self.team ) )
 			wait .05;
@@ -761,11 +787,12 @@ classWatch()
 
 		wait 0.5;
 
-		self notify( "menuresponse", game["menu_changeclass"], self chooseRandomClass() );
+		if ( !maps\mp\gametypes\_globallogic_utils::isValidClass( self.class ) || !isDefined( self.bot_change_class ) )
+			self notify( "menuresponse", game["menu_changeclass"], self chooseRandomClass() );
 
 		self.bot_change_class = true;
 
-		while ( isdefined( self.team ) && isdefined( self.class ) && isDefined( self.bot_change_class ) )
+		while ( isdefined( self.team ) && maps\mp\gametypes\_globallogic_utils::isValidClass( self.class ) && isDefined( self.bot_change_class ) )
 			wait .05;
 	}
 }
@@ -838,31 +865,31 @@ doCustomRank()
 {
 	self endon( "disconnect" );
 
+	// prevent generating classes
 	if ( getDvarInt( "bots_loadout_rank" ) != -1 )
 		self.pers[ "bot_loadout" ] = true;
 
+	// wait for the original scripts to execute
 	wait 0.25;
 
-	rank = self.pers[ "rank" ];
+	// get rank
+	rankxp = self.pers[ "rankxp" ];
 
 	if ( getDvarInt( "bots_loadout_rank" ) != -1 )
 	{
 		if ( getDvarInt( "bots_loadout_rank" ) == 0 )
-			rank = randomInt( level.maxrank + 1 );
+			rankxp = maps\mp\gametypes\_rank::getrankinfominxp( randomInt( level.maxrank + 1 ) );
 		else
-			rank = getDvarInt( "bots_loadout_rank" );
+			rankxp = maps\mp\gametypes\_rank::getrankinfominxp( getDvarInt( "bots_loadout_rank" ) );
 	}
 
+	// apply
 	self.pers[ "bot_prestige" ] = bot_get_prestige();
+	self.pers[ "bot_rankxp" ] = rankxp;
 
-	self.pers[ "prestige" ] = self.pers[ "bot_prestige" ];
-	self.pers[ "rank" ] = rank;
-	self.pers[ "rankxp" ] = maps\mp\gametypes\_rank::getrankinfominxp( rank );
+	self setCustomRanks();
 
-	self setRank( self.pers[ "rank" ], self.pers[ "prestige" ] );
-
-	self maps\mp\gametypes\_rank::syncxpstat();
-
+	// generate the custom classes
 	if ( getDvarInt( "bots_loadout_rank" ) != -1 )
 	{
 		self botsetdefaultclass( 5, "class_assault" );
@@ -880,6 +907,7 @@ doCustomRank()
 */
 allowClassChoice()
 {
+	// check gungame?
 	return true;
 }
 
@@ -888,6 +916,7 @@ allowClassChoice()
 */
 allowTeamChoice()
 {
+	// check gungame?
 	return true;
 }
 
