@@ -602,6 +602,50 @@ connected()
 	self thread onBotSpawned();
 
 	self thread setRanks();
+
+	self thread watchBotDebugEvent();
+}
+
+/*
+	DEBUG
+*/
+watchBotDebugEvent()
+{
+	self endon( "disconnect" );
+
+	for ( ;; )
+	{
+		self waittill( "bot_event", msg, str, b, c, d, e, f, g );
+
+		if ( GetDvarInt( "bots_main_debug" ) >= 2 )
+		{
+			big_str = "Bot Warfare debug: " + self.name + ": " + msg + ": " + str;
+
+			if ( isDefined( b ) && isString( b ) )
+				big_str += ": " + b;
+
+			if ( isDefined( c ) && isString( c ) )
+				big_str += ": " + c;
+
+			if ( isDefined( d ) && isString( d ) )
+				big_str += ": " + d;
+
+			if ( isDefined( e ) && isString( e ) )
+				big_str += ": " + e;
+
+			if ( isDefined( f ) && isString( f ) )
+				big_str += ": " + f;
+
+			if ( isDefined( g ) && isString( g ) )
+				big_str += ": " + g;
+
+			Print( big_str );
+		}
+		else if ( msg == "debug" && GetDvarInt( "bots_main_debug" ) )
+		{
+			Print( "Bot Warfare debug: " + self.name + ": " + str );
+		}
+	}
 }
 
 /*
@@ -616,6 +660,7 @@ onBotSpawned()
 		self waittill( "spawned_player" );
 
 		self thread watch_for_override_stuff();
+		self BotNotifyBotEvent( "debug", "we spawned!" );
 
 		waittillframeend;
 
@@ -640,7 +685,7 @@ botMovementOverride( a, b ) {}
 botClearMovementOverride() {}
 botClearButtonOverride( a ) {}
 botButtonOverride( a, b ) {}
-botClearOverrides() {}
+botClearOverrides( a ) {}
 
 /*
 	custom movement stuff
@@ -650,7 +695,7 @@ watch_for_override_stuff()
 	self endon( "disconnect" );
 	self endon( "death" );
 
-	self botClearOverrides();
+	self botClearOverrides( true );
 
 	NEAR_DIST = 80;
 	LONG_DIST = 1000;
@@ -690,12 +735,12 @@ watch_for_override_stuff()
 
 					// drop shot
 					self botMovementOverride( 0, 0 );
-					self botButtonOverride( "stance", "prone" );
+					self botButtonOverride( "prone", "enable" );
 
 					wait 1.5;
 
 					self botClearMovementOverride();
-					self botClearButtonOverride( "stance" );
+					self botClearButtonOverride( "prone" );
 				}
 			}
 			else
@@ -703,9 +748,9 @@ watch_for_override_stuff()
 				last_jump_time = time;
 
 				// jump shot
-				self botButtonOverride( "jump", true );
+				self botButtonOverride( "gostand", "enable" );
 				wait 0.1;
-				self botClearButtonOverride( "jump" );
+				self botClearButtonOverride( "gostand" );
 			}
 		}
 
@@ -918,6 +963,14 @@ allowTeamChoice()
 {
 	// check gungame?
 	return true;
+}
+
+/*
+	Notify the bot chat message
+*/
+BotNotifyBotEvent( msg, a, b, c, d, e, f, g )
+{
+	self notify( "bot_event", msg, a, b, c, d, e, f, g );
 }
 
 /*

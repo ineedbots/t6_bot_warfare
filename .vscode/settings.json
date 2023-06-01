@@ -12,7 +12,7 @@
 	"vscode-codscript.use_builtin_completionItems": false,
 
 	"triggerTaskOnSave.tasks": {
-		"Compile current GSC File": ["*.gsc"]
+		"Compile current GSC File no": ["*.gsc"]
 	},
 	"Lua.diagnostics.globals": [
 		"InheritFrom",
