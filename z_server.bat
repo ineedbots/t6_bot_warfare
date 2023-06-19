@@ -34,6 +34,6 @@ echo (%date%)  -  (%time%) %name% server start.
 
 cd /D %pluto_path%
 :server
-start /wait /abovenormal "%name%" "%exe_path%" %pluto_game_mode% "%gamepath%" -dedicated -sv_config "%cfg%" -key "%key%" -net_ip "%ip%" -net_port "%port%" -rcon_password "%rcon_password%" %cmd_extras%
+start /wait /abovenormal /b "%name%" "%exe_path%" %pluto_game_mode% "%gamepath%" -dedicated -sv_config "%cfg%" -key "%key%" -net_ip "%ip%" -net_port "%port%" -rcon_password "%rcon_password%" %cmd_extras%
 echo (%date%)  -  (%time%) WARNING: %name% server closed or dropped... server restarts.
 goto server
