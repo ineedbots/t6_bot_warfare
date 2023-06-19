@@ -13,6 +13,15 @@
 #include common_scripts\utility;
 
 /*
+	Replace func stuff
+*/
+main()
+{
+	// fix bot grenade launcher usage
+	replaceFunc( maps\mp\bots\_bot_combat::bot_should_hip_fire, ::bot_should_hip_fire_replaced );
+}
+
+/*
 	Entry point to the bots
 */
 init()
@@ -90,6 +99,65 @@ init()
 	thread onPlayerConnect();
 
 	thread handleBots();
+}
+
+/*
+	Fixes gl usage
+*/
+bot_should_hip_fire_replaced()
+{
+	enemy = self.bot.threat.entity;
+	weapon = self getcurrentweapon();
+
+	if ( weapon == "none" )
+		return 0;
+
+	if ( weaponisdualwield( weapon ) )
+		return 1;
+
+	class = weaponclass( weapon );
+
+	if ( isplayer( enemy ) && class == "spread" )
+		return 1;
+
+	if ( class == "grenade" ) // added
+		return 1;
+
+	distsq = distancesquared( self.origin, enemy.origin );
+	distcheck = 0;
+
+	switch ( class )
+	{
+		case "mg":
+			distcheck = 250;
+			break;
+
+		case "smg":
+			distcheck = 350;
+			break;
+
+		case "spread":
+			distcheck = 400;
+			break;
+
+		case "pistol":
+			distcheck = 200;
+			break;
+
+		case "rocketlauncher":
+			distcheck = 0;
+			break;
+
+		case "rifle":
+		default:
+			distcheck = 300;
+			break;
+	}
+
+	if ( isweaponscopeoverlay( weapon ) )
+		distcheck = 500;
+
+	return distsq < distcheck * distcheck;
 }
 
 /*
@@ -681,11 +749,7 @@ getConeDot( to, from, dir )
 	return vectordot( dirToTarget, forward );
 }
 
-botMovementOverride( a, b ) {}
-botClearMovementOverride() {}
-botClearButtonOverride( a ) {}
-botButtonOverride( a, b ) {}
-botClearOverrides( a ) {}
+
 
 /*
 	custom movement stuff
