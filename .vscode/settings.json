@@ -10,10 +10,6 @@
 		"strings": true
 	},
 	"vscode-codscript.use_builtin_completionItems": false,
-
-	"triggerTaskOnSave.tasks": {
-		"Compile current GSC File no": ["*.gsc"]
-	},
 	"Lua.diagnostics.globals": [
 		"InheritFrom",
 		"CoD",
