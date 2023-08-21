@@ -752,6 +752,12 @@ getConeDot( to, from, dir )
 	return vectordot( dirToTarget, forward );
 }
 
+botMovementOverride( a, b ) {}
+botClearMovementOverride() {}
+botClearButtonOverride( a ) {}
+botButtonOverride( a, b ) {}
+botClearOverrides( a ) {}
+
 /*
 	custom movement stuff
 */
