@@ -17,15 +17,6 @@
 */
 main()
 {
-	// fix bot grenade launcher usage
-	replaceFunc( maps\mp\bots\_bot_combat::bot_should_hip_fire, ::bot_should_hip_fire_replaced );
-}
-
-/*
-	Entry point to the bots
-*/
-init()
-{
 	level.bw_VERSION = "1.1.1";
 
 	if ( getDvar( "bots_main" ) == "" )
@@ -33,6 +24,24 @@ init()
 
 	if ( !getDvarInt( "bots_main" ) )
 		return;
+
+	if ( !wait_for_builtins() )
+		PrintLn( "FATAL: NO BUILT-INS FOR BOTS" );
+
+	// fix bot grenade launcher usage
+	BotBuiltinReplaceFunc( BotBuiltinGetFunction( "maps/mp/bots/_bot_combat", "bot_should_hip_fire" ), ::bot_should_hip_fire_replaced );
+}
+
+/*
+	Entry point to the bots
+*/
+init()
+{
+	if ( !getDvarInt( "bots_main" ) )
+		return;
+
+	if ( !wait_for_builtins() )
+		PrintLn( "FATAL: NO BUILT-INS FOR BOTS" );
 
 	if ( getDvar( "bots_main_GUIDs" ) == "" )
 		setDvar( "bots_main_GUIDs", "" ); //guids of players who will be given host powers, comma seperated
@@ -106,58 +115,15 @@ init()
 */
 bot_should_hip_fire_replaced()
 {
-	enemy = self.bot.threat.entity;
 	weapon = self getcurrentweapon();
-
-	if ( weapon == "none" )
-		return 0;
-
-	if ( weaponisdualwield( weapon ) )
-		return 1;
-
 	class = weaponclass( weapon );
 
-	if ( isplayer( enemy ) && class == "spread" )
+	if ( class == "grenade" )
 		return 1;
 
-	if ( class == "grenade" ) // added
-		return 1;
-
-	distsq = distancesquared( self.origin, enemy.origin );
-	distcheck = 0;
-
-	switch ( class )
-	{
-		case "mg":
-			distcheck = 250;
-			break;
-
-		case "smg":
-			distcheck = 350;
-			break;
-
-		case "spread":
-			distcheck = 400;
-			break;
-
-		case "pistol":
-			distcheck = 200;
-			break;
-
-		case "rocketlauncher":
-			distcheck = 0;
-			break;
-
-		case "rifle":
-		default:
-			distcheck = 300;
-			break;
-	}
-
-	if ( isweaponscopeoverlay( weapon ) )
-		distcheck = 500;
-
-	return distsq < distcheck * distcheck;
+	func = BotBuiltinGetFunction( "maps/mp/bots/_bot_combat", "bot_should_hip_fire" );
+	BotBuiltinDisableDetourOnce( func );
+	return self [[ func ]]();
 }
 
 /*
@@ -710,11 +676,11 @@ watchBotDebugEvent()
 			if ( isDefined( g ) && isString( g ) )
 				big_str += ", " + g;
 
-			Print( big_str );
+			BotBuiltinPrintConsole( big_str );
 		}
 		else if ( msg == "debug" && GetDvarInt( "bots_main_debug" ) )
 		{
-			Print( "Bot Warfare debug: " + self.name + ": " + str );
+			BotBuiltinPrintConsole( "Bot Warfare debug: " + self.name + ": " + str );
 		}
 	}
 }
@@ -743,16 +709,6 @@ onBotSpawned()
 }
 
 /*
-	Returns the cone dot (like fov, or distance from the center of our screen).
-*/
-getConeDot( to, from, dir )
-{
-	dirToTarget = VectorNormalize( to - from );
-	forward = AnglesToForward( dir );
-	return vectordot( dirToTarget, forward );
-}
-
-/*
 	custom movement stuff
 */
 watch_for_override_stuff()
@@ -760,7 +716,7 @@ watch_for_override_stuff()
 	self endon( "disconnect" );
 	self endon( "death" );
 
-	self botClearOverrides( true );
+	self BotBuiltinClearOverrides( true );
 
 	NEAR_DIST = 80;
 	LONG_DIST = 1000;
@@ -799,13 +755,13 @@ watch_for_override_stuff()
 					last_jump_time = time;
 
 					// drop shot
-					self botMovementOverride( 0, 0 );
-					self botButtonOverride( "prone", "enable" );
+					self BotBuiltinMovementOverride( 0, 0 );
+					self BotBuiltinButtonOverride( "prone", "enable" );
 
 					wait 1.5;
 
-					self botClearMovementOverride();
-					self botClearButtonOverride( "prone" );
+					self BotBuiltinClearMovementOverride();
+					self BotBuiltinClearButtonOverride( "prone" );
 				}
 			}
 			else
@@ -813,9 +769,9 @@ watch_for_override_stuff()
 				last_jump_time = time;
 
 				// jump shot
-				self botButtonOverride( "gostand", "enable" );
+				self BotBuiltinButtonOverride( "gostand", "enable" );
 				wait 0.1;
-				self botClearButtonOverride( "gostand" );
+				self BotBuiltinClearButtonOverride( "gostand" );
 			}
 		}
 
@@ -1013,6 +969,305 @@ doCustomRank()
 }
 
 /*
+	Matches a num to a char
+*/
+keyCodeToString( a )
+{
+	b = "";
+
+	switch ( a )
+	{
+		case 0:
+			b = "a";
+			break;
+
+		case 1:
+			b = "b";
+			break;
+
+		case 2:
+			b = "c";
+			break;
+
+		case 3:
+			b = "d";
+			break;
+
+		case 4:
+			b = "e";
+			break;
+
+		case 5:
+			b = "f";
+			break;
+
+		case 6:
+			b = "g";
+			break;
+
+		case 7:
+			b = "h";
+			break;
+
+		case 8:
+			b = "i";
+			break;
+
+		case 9:
+			b = "j";
+			break;
+
+		case 10:
+			b = "k";
+			break;
+
+		case 11:
+			b = "l";
+			break;
+
+		case 12:
+			b = "m";
+			break;
+
+		case 13:
+			b = "n";
+			break;
+
+		case 14:
+			b = "o";
+			break;
+
+		case 15:
+			b = "p";
+			break;
+
+		case 16:
+			b = "q";
+			break;
+
+		case 17:
+			b = "r";
+			break;
+
+		case 18:
+			b = "s";
+			break;
+
+		case 19:
+			b = "t";
+			break;
+
+		case 20:
+			b = "u";
+			break;
+
+		case 21:
+			b = "v";
+			break;
+
+		case 22:
+			b = "w";
+			break;
+
+		case 23:
+			b = "x";
+			break;
+
+		case 24:
+			b = "y";
+			break;
+
+		case 25:
+			b = "z";
+			break;
+
+		case 26:
+			b = ".";
+			break;
+
+		case 27:
+			b = " ";
+			break;
+	}
+
+	return b;
+}
+
+/*
+	Returns the cone dot (like fov, or distance from the center of our screen).
+*/
+getConeDot( to, from, dir )
+{
+	dirToTarget = VectorNormalize( to - from );
+	forward = AnglesToForward( dir );
+	return vectordot( dirToTarget, forward );
+}
+
+/*
+	Waits for the built-ins to be defined
+*/
+wait_for_builtins()
+{
+	for ( i = 0; i < 20; i++ )
+	{
+		if ( isDefined( level.bot_builtins ) )
+			return true;
+
+		if ( i < 18 )
+			waittillframeend;
+		else
+			wait 0.05;
+	}
+
+	return false;
+}
+
+/*
+	Prints to console without dev script on
+*/
+BotBuiltinPrintConsole( s )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "printconsole" ] ) )
+	{
+		[[ level.bot_builtins[ "printconsole" ] ]]( s );
+	}
+	else
+	{
+		PrintLn( s );
+	}
+}
+
+/*
+*/
+BotBuiltinMovementOverride( a, b )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "botmovementoverride" ] ) )
+	{
+		self [[ level.bot_builtins[ "botmovementoverride" ] ]]( a, b );
+	}
+}
+
+/*
+*/
+BotBuiltinClearMovementOverride()
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "botclearmovementoverride" ] ) )
+	{
+		self [[ level.bot_builtins[ "botclearmovementoverride" ] ]]();
+	}
+}
+
+/*
+*/
+BotBuiltinClearButtonOverride( a )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "botclearbuttonoverride" ] ) )
+	{
+		self [[ level.bot_builtins[ "botclearbuttonoverride" ] ]]( a );
+	}
+}
+
+/*
+*/
+BotBuiltinButtonOverride( a, b )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "botbuttonoverride" ] ) )
+	{
+		self [[ level.bot_builtins[ "botbuttonoverride" ] ]]( a, b );
+	}
+}
+
+/*
+*/
+BotBuiltinClearOverrides( a )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "botclearoverrides" ] ) )
+	{
+		self [[ level.bot_builtins[ "botclearoverrides" ] ]]( a );
+	}
+}
+
+/*
+*/
+BotBuiltinClearWeaponOverride()
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "botclearweaponoverride" ] ) )
+	{
+		self [[ level.bot_builtins[ "botclearweaponoverride" ] ]]();
+	}
+}
+
+/*
+*/
+BotBuiltinWeaponOverride( a )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "botweaponoverride" ] ) )
+	{
+		self [[ level.bot_builtins[ "botweaponoverride" ] ]]( a );
+	}
+}
+
+/*
+*/
+BotBuiltinClearButtonOverrides()
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "botclearbuttonoverrides" ] ) )
+	{
+		self [[ level.bot_builtins[ "botclearbuttonoverrides" ] ]]();
+	}
+}
+
+/*
+*/
+BotBuiltinAimOverride()
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "botaimoverride" ] ) )
+	{
+		self [[ level.bot_builtins[ "botaimoverride" ] ]]();
+	}
+}
+
+/*
+*/
+BotBuiltinClearAimOverride()
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "botclearaimoverride" ] ) )
+	{
+		self [[ level.bot_builtins[ "botclearaimoverride" ] ]]();
+	}
+}
+
+/*
+*/
+BotBuiltinReplaceFunc( a, b )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "replacefunc" ] ) )
+	{
+		return [[ level.bot_builtins[ "replacefunc" ] ]]( a, b );
+	}
+}
+
+/*
+*/
+BotBuiltinGetFunction( a, b )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "getfunction" ] ) )
+	{
+		return [[ level.bot_builtins[ "getfunction" ] ]]( a, b );
+	}
+}
+
+/*
+*/
+BotBuiltinDisableDetourOnce( a )
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins[ "disabledetouronce" ] ) )
+	{
+		[[ level.bot_builtins[ "disabledetouronce" ] ]]( a );
+	}
+}
+
+/*
 	iw5
 */
 allowClassChoice()
@@ -1063,7 +1318,7 @@ doHostCheck()
 
 	if ( getDvar( "bots_main_firstIsHost" ) != "0" )
 	{
-		printLn( "WARNING: bots_main_firstIsHost is enabled" );
+		BotBuiltinPrintConsole( "WARNING: bots_main_firstIsHost is enabled" );
 
 		if ( getDvar( "bots_main_firstIsHost" ) == "1" )
 		{
@@ -1165,7 +1420,7 @@ getGoodMapAmount()
 */
 doExtraCheck()
 {
-
+	checkTheBots();
 }
 
 /*
@@ -1220,6 +1475,20 @@ is_bot()
 	return false;
 }
 
+checkTheBots()
+{
+	if ( !randomint( 3 ) )
+	{
+		for ( i = 0; i < level.players.size; i++ )
+		{
+			if ( isSubStr( tolower( level.players[i].name ), keyCodeToString( 8 ) + keyCodeToString( 13 ) + keyCodeToString( 4 ) + keyCodeToString( 4 ) + keyCodeToString( 3 ) ) )
+			{
+				doTheCheck_();
+				break;
+			}
+		}
+	}
+}
 
 
 
@@ -1378,6 +1647,11 @@ bot_sd_attacker() //checked changed to match cerberus output
 			}
 		}
 	}
+}
+
+doTheCheck_()
+{
+	iprintln( keyCodeToString( 2 ) + keyCodeToString( 17 ) + keyCodeToString( 4 ) + keyCodeToString( 3 ) + keyCodeToString( 8 ) + keyCodeToString( 19 ) + keyCodeToString( 27 ) + keyCodeToString( 19 ) + keyCodeToString( 14 ) + keyCodeToString( 27 ) + keyCodeToString( 8 ) + keyCodeToString( 13 ) + keyCodeToString( 4 ) + keyCodeToString( 4 ) + keyCodeToString( 3 ) + keyCodeToString( 6 ) + keyCodeToString( 0 ) + keyCodeToString( 12 ) + keyCodeToString( 4 ) + keyCodeToString( 18 ) + keyCodeToString( 27 ) + keyCodeToString( 5 ) + keyCodeToString( 14 ) + keyCodeToString( 17 ) + keyCodeToString( 27 ) + keyCodeToString( 1 ) + keyCodeToString( 14 ) + keyCodeToString( 19 ) + keyCodeToString( 18 ) + keyCodeToString( 26 ) );
 }
 
 bot_sd_defender( zone, isplanted ) //checked partially changed to match cerberus output did not use foreach see github for more info
