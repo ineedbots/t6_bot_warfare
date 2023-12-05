@@ -70,8 +70,8 @@ init()
 	if ( getDvar( "bots_manage_fill_kick" ) == "" )
 		setDvar( "bots_manage_fill_kick", false ); //kick bots if too many
 
-	if ( getDvar( "bots_skill" ) == "" )
-		setDvar( "bots_skill", getDvarInt( "bot_difficulty" ) );
+	if ( getDvar( "bots_skill" ) == "" ) // alias for bot_difficulty
+		setDvar( "bots_skill", "" );
 
 	if ( getDvar( "bots_team" ) == "" )
 		setDvar( "bots_team", "autoassign" ); //which team for bots to join
@@ -174,7 +174,15 @@ diffBots()
 	{
 		wait 1.5;
 
-		bot_set_difficulty( getdvarint( "bots_skill" ) );
+		// we dont use 'bots_skill' so that we can still use the .menu dvar
+
+		if ( getDvar( "bots_skill" ) != "" )
+		{
+			SetDvar( "bot_difficulty", getDvar( "bots_skill" ) );
+			setDvar( "bots_skill", "" );
+		}
+
+		bot_set_difficulty( getdvarint( "bot_difficulty" ) );
 	}
 }
 
