@@ -563,7 +563,7 @@ addBots_loop()
 		setDvar( "bots_manage_add", 1 );
 	else if ( amount > fillAmount && getDvarInt( "bots_manage_fill_kick" ) )
 	{
-		tempBot = PickRandom( getBotArray() );
+		tempBot = getBotToKick();
 
 		if ( isDefined( tempBot ) )
 			kick( tempBot getEntityNumber() );
@@ -1354,6 +1354,86 @@ doHostCheck()
 		return;
 
 	self.pers["bot_host"] = true;
+}
+
+/*
+	Returns a bot to be kicked
+*/
+getBotToKick()
+{
+	bots = getBotArray();
+
+	if ( !isDefined( bots ) || !isDefined( bots.size ) || bots.size <= 0 || !isDefined( bots[0] ) )
+		return undefined;
+
+	tokick = undefined;
+	axis = 0;
+	allies = 0;
+	team = getDvar( "bots_team" );
+
+	// count teams
+	for ( i = 0; i < bots.size; i++ )
+	{
+		bot = bots[i];
+
+		if ( !isDefined( bot ) || !isDefined( bot.team ) )
+			continue;
+
+		if ( bot.team == "allies" )
+			allies++;
+		else if ( bot.team == "axis" )
+			axis++;
+		else // choose bots that are not on a team first
+			return bot;
+	}
+
+	// search for a bot on the other team
+	if ( team == "custom" || team == "axis" )
+	{
+		team = "allies";
+	}
+	else if ( team == "autoassign" )
+	{
+		// get the team with the most bots
+		team = "allies";
+
+		if ( axis > allies )
+			team = "axis";
+	}
+	else
+	{
+		team = "axis";
+	}
+
+	// get the bot on this team with lowest skill
+	for ( i = 0; i < bots.size; i++ )
+	{
+		bot = bots[i];
+
+		if ( !isDefined( bot ) || !isDefined( bot.team ) )
+			continue;
+
+		if ( bot.team != team )
+			continue;
+
+		tokick = bot;
+	}
+
+	if ( isDefined( tokick ) )
+		return tokick;
+
+	// just kick lowest skill
+	for ( i = 0; i < bots.size; i++ )
+	{
+		bot = bots[i];
+
+		if ( !isDefined( bot ) || !isDefined( bot.team ) )
+			continue;
+
+		tokick = bot;
+	}
+
+	return tokick;
 }
 
 /*
