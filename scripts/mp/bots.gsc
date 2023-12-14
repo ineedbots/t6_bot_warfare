@@ -705,6 +705,7 @@ onBotSpawned()
 		self waittill( "spawned_player" );
 
 		self thread watch_for_override_stuff();
+		self thread watch_for_melee_override();
 		self BotNotifyBotEvent( "debug", "we spawned!" );
 
 		waittillframeend;
@@ -713,6 +714,63 @@ onBotSpawned()
 
 		if ( randomInt( 100 ) < 2 )
 			self.bot_change_class = undefined;
+	}
+}
+
+/*
+	custom movement stuff
+*/
+watch_for_melee_override()
+{
+	self endon( "disconnect" );
+	self endon( "death" );
+
+	self BotBuiltinClearMeleeParams();
+
+	for ( ;; )
+	{
+		while ( ( !self maps\mp\bots\_bot_combat::threat_is_player() && !self maps\mp\bots\_bot_combat::threat_is_dog() ) || self IsRemoteControlling() || !self HasWeapon( "knife_mp" ) || !getDvarInt( "aim_automelee_enabled" ) )
+			wait 0.05;
+
+		threat = self.bot.threat.entity;
+
+		while ( isDefined( threat ) && isDefined( self.bot.threat.entity ) && self.bot.threat.entity == threat )
+		{
+			dist = distance( self.origin, threat.origin );
+
+			if ( self isOnGround() && self GetStance() != "prone" && dist < getDvarFloat( "aim_automelee_range" ) && ( getConeDot( threat.origin, self.origin, self getPlayerAngles() ) > 0.9 || dist < 10 ) )
+			{
+				self BotBuiltinBotMeleeParams( threat getEntityNumber(), dist );
+				self BotBuiltinButtonOverride( "melee", "enable" );
+				self BotBuiltinAimOverride();
+
+				time_left = 1;
+				once = false;
+
+				while ( time_left > 0 && isDefined( threat ) && isAlive( threat ) )
+				{
+					self setPlayerAngles( VectorToAngles( threat getTagOrigin( "j_spine4" ) - self getEye() ) );
+					time_left -= 0.05;
+					wait 0.05;
+
+					if ( !once )
+					{
+						once = true;
+						self BotBuiltinClearButtonOverride( "melee" );
+					}
+				}
+
+				if ( !once )
+					self BotBuiltinClearButtonOverride( "melee" );
+
+				self BotBuiltinClearMeleeParams();
+				self BotBuiltinClearAimOverride();
+				wait 1;
+				break;
+			}
+
+			wait 0.05;
+		}
 	}
 }
 
@@ -747,14 +805,20 @@ watch_for_override_stuff()
 
 	for ( ;; )
 	{
-		while ( !self maps\mp\bots\_bot_combat::threat_is_player() )
+		while ( !self maps\mp\bots\_bot_combat::threat_is_player() || self IsRemoteControlling() )
 			wait 0.05;
 
 		threat = self.bot.threat.entity;
 		dist = Distance( threat.origin, self.origin );
 		time = GetTime();
+		weap = self GetCurrentWeapon();
 
-		if ( ( dist > NEAR_DIST ) && ( dist < LONG_DIST ) && ( randomInt( 100 ) < chance ) && ( ( time - last_jump_time ) > SPAM_JUMP_TIME ) )
+		weapon_is_good = true;
+
+		if ( weap == "none" || !self GetWeaponAmmoClip( weap ) )
+			weapon_is_good = false;
+
+		if ( weapon_is_good && ( dist > NEAR_DIST ) && ( dist < LONG_DIST ) && ( randomInt( 100 ) < chance ) && ( ( time - last_jump_time ) > SPAM_JUMP_TIME ) )
 		{
 			if ( randomInt( 2 ) )
 			{
@@ -783,7 +847,7 @@ watch_for_override_stuff()
 			}
 		}
 
-		while ( self maps\mp\bots\_bot_combat::threat_is_player() && ( threat == self.bot.threat.entity ) )
+		while ( isDefined( threat ) && isDefined( self.bot.threat.entity ) && ( threat == self.bot.threat.entity ) )
 			wait 0.05;
 	}
 }
@@ -1253,6 +1317,16 @@ BotBuiltinBotMeleeParams( entNum, dist )
 	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins["botmeleeparams"] ) )
 	{
 		self [[ level.bot_builtins["botmeleeparams" ]]]( entNum, dist );
+	}
+}
+
+/*
+*/
+BotBuiltinClearMeleeParams()
+{
+	if ( isDefined( level.bot_builtins ) && isDefined( level.bot_builtins["clearbotmeleeparams"] ) )
+	{
+		self [[ level.bot_builtins["clearbotmeleeparams" ]]]();
 	}
 }
 
