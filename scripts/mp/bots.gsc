@@ -6,9 +6,6 @@
 */
 
 #include maps\mp\gametypes\_globallogic_utils;
-#include maps\mp\bots\_bot_combat;
-#include maps\mp\bots\_bot;
-#include maps\mp\gametypes\_gameobjects;
 #include maps\mp\_utility;
 #include common_scripts\utility;
 
@@ -703,9 +700,12 @@ onBotSpawned()
 	for ( ;; )
 	{
 		self waittill( "spawned_player" );
+		self BotBuiltinClearOverrides( true );
+		self BotBuiltinWeaponOverride( self getCurrentWeapon() );
 
 		self thread watch_for_override_stuff();
 		self thread watch_for_melee_override();
+		self thread bot_watch_think_mw2();
 		self BotNotifyBotEvent( "debug", "we spawned!" );
 
 		waittillframeend;
@@ -718,14 +718,76 @@ onBotSpawned()
 }
 
 /*
+	Gets a GL
+*/
+getValidTube()
+{
+	weaps = self getweaponslist( true );
+
+	for ( i = 0; i < weaps.size; i++ )
+	{
+		weap = weaps[i];
+
+		if ( !self GetAmmoCount( weap ) )
+			continue;
+
+		if ( !isstrstart( weap, "gl_" ) )
+			continue;
+
+		return weap;
+	}
+
+	return undefined;
+}
+
+/*
+	Bots play mw2
+*/
+bot_watch_think_mw2()
+{
+	self endon( "disconnect" );
+	self endon( "death" );
+	level endon( "game_ended" );
+
+	for ( ;; )
+	{
+		wait randomIntRange( 1, 4 );
+
+		if ( self IsRemoteControlling() )
+			continue;
+
+		if ( self maps\mp\bots\_bot_combat::bot_has_enemy() )
+			continue;
+
+		tube = self getValidTube();
+
+		if ( !isDefined( tube ) )
+		{
+			if ( self GetAmmoCount( "usrpg_mp" ) )
+				tube = "usrpg_mp";
+			else if ( self GetAmmoCount( "smaw_mp" ) )
+				tube = "smaw_mp";
+			else
+				return;
+		}
+
+		if ( self GetCurrentWeapon() == tube )
+			return;
+
+		if ( randomInt( 100 ) > 35 )
+			return;
+
+		self switchtoweapon( tube );
+	}
+}
+
+/*
 	custom movement stuff
 */
 watch_for_melee_override()
 {
 	self endon( "disconnect" );
 	self endon( "death" );
-
-	self BotBuiltinClearMeleeParams();
 
 	for ( ;; )
 	{
@@ -781,8 +843,6 @@ watch_for_override_stuff()
 {
 	self endon( "disconnect" );
 	self endon( "death" );
-
-	self BotBuiltinClearOverrides( true );
 
 	NEAR_DIST = 80;
 	LONG_DIST = 1000;
