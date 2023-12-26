@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@main
 
       - name: Setup gsc-tool
-        uses: diamante/setup-gsc-tool@main
+        uses: diamante0018/setup-gsc-tool@main
 
       - name: Compile script
         run: './gsc-tool comp t6 pc .'
