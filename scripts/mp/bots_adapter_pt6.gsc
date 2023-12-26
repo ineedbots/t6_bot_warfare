@@ -14,7 +14,7 @@ main()
 	level.bot_builtins["botmeleeparams"] = ::do_botmeleeparams;
 	level.bot_builtins["clearbotmeleeparams"] = ::do_clearbotmeleeparams;
 	level.bot_builtins["getfunction"] = ::do_getfunction;
-	level.bot_builtins["replacefunc"] = ::do_replacefunc;
+	level.bot_builtins["replacefunc"] = ::do_replacefunc;a
 	level.bot_builtins["disabledetouronce"] = ::do_disabledetouronce;
 }
 
