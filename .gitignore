@@ -6,3 +6,5 @@ demos/
 missingasset.csv
 mpStats
 mpClassSets
+*.exe
+compiled/

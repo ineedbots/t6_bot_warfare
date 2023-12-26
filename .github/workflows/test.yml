@@ -1,0 +1,20 @@
+name: test
+
+on: [push]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Setup gsc-tool
+        uses: diamante/setup-gsc-tool@main
+
+      - name: Compile script
+        run: './gsc-tool comp t6 pc .'
