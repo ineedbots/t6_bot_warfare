@@ -17,4 +17,4 @@ jobs:
         uses: diamante0018/setup-gsc-tool@main
 
       - name: Compile script
-        run: './gsc-tool comp t6 pc .'
+        run: 'gsc-tool comp t6 pc .'
