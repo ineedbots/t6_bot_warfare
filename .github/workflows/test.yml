@@ -35,7 +35,7 @@ jobs:
 
       - name: Compile test script
         run: |
-          ./gsc-tool comp t6 pc .
+          gsc-tool comp t6 pc .
 
   test-macos:
     name: Test on macOS
@@ -52,4 +52,4 @@ jobs:
 
       - name: Compile test script
         run: |
-          ./gsc-tool comp t6 pc .
+          gsc-tool comp t6 pc .
