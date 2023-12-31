@@ -1,86 +1,86 @@
 main()
 {
-	level.bot_builtins["printconsole"] = ::do_printconsole;
-	level.bot_builtins["botmovementoverride"] = ::do_botmovementoverride;
-	level.bot_builtins["botclearmovementoverride"] = ::do_botclearmovementoverride;
-	level.bot_builtins["botclearbuttonoverride"] = ::do_botclearbuttonoverride;
-	level.bot_builtins["botbuttonoverride"] = ::do_botbuttonoverride;
-	level.bot_builtins["botclearoverrides"] = ::do_botclearoverrides;
-	level.bot_builtins["botclearweaponoverride"] = ::do_botclearweaponoverride;
-	level.bot_builtins["botweaponoverride"] = ::do_botweaponoverride;
-	level.bot_builtins["botclearbuttonoverrides"] = ::do_botclearbuttonoverrides;
-	level.bot_builtins["botaimoverride"] = ::do_botaimoverride;
-	level.bot_builtins["botclearaimoverride"] = ::do_botclearaimoverride;
-	level.bot_builtins["botmeleeparams"] = ::do_botmeleeparams;
-	level.bot_builtins["clearbotmeleeparams"] = ::do_clearbotmeleeparams;
-	level.bot_builtins["getfunction"] = ::do_getfunction;
-	level.bot_builtins["replacefunc"] = ::do_replacefunc;
-	level.bot_builtins["disabledetouronce"] = ::do_disabledetouronce;
+	level.bot_builtins[ "printconsole" ] = ::do_printconsole;
+	level.bot_builtins[ "botmovementoverride" ] = ::do_botmovementoverride;
+	level.bot_builtins[ "botclearmovementoverride" ] = ::do_botclearmovementoverride;
+	level.bot_builtins[ "botclearbuttonoverride" ] = ::do_botclearbuttonoverride;
+	level.bot_builtins[ "botbuttonoverride" ] = ::do_botbuttonoverride;
+	level.bot_builtins[ "botclearoverrides" ] = ::do_botclearoverrides;
+	level.bot_builtins[ "botclearweaponoverride" ] = ::do_botclearweaponoverride;
+	level.bot_builtins[ "botweaponoverride" ] = ::do_botweaponoverride;
+	level.bot_builtins[ "botclearbuttonoverrides" ] = ::do_botclearbuttonoverrides;
+	level.bot_builtins[ "botaimoverride" ] = ::do_botaimoverride;
+	level.bot_builtins[ "botclearaimoverride" ] = ::do_botclearaimoverride;
+	level.bot_builtins[ "botmeleeparams" ] = ::do_botmeleeparams;
+	level.bot_builtins[ "clearbotmeleeparams" ] = ::do_clearbotmeleeparams;
+	level.bot_builtins[ "getfunction" ] = ::do_getfunction;
+	level.bot_builtins[ "replacefunc" ] = ::do_replacefunc;
+	level.bot_builtins[ "disabledetouronce" ] = ::do_disabledetouronce;
 }
 
 do_printconsole( s )
 {
-	PrintLn( s );
+	println( s );
 }
 
 do_botmovementoverride( a, b )
 {
-	self botMovementOverride( a, b );
+	self botmovementoverride( a, b );
 }
 
 do_botclearmovementoverride()
 {
-	self botClearMovementOverride();
+	self botclearmovementoverride();
 }
 
 do_botclearbuttonoverride( a )
 {
-	self botClearButtonOverride( a );
+	self botclearbuttonoverride( a );
 }
 
 do_botbuttonoverride( a, b )
 {
-	self botButtonOverride( a, b );
+	self botbuttonoverride( a, b );
 }
 
 do_botclearoverrides( a )
 {
-	self botClearOverrides( a );
+	self botclearoverrides( a );
 }
 
 do_botclearweaponoverride()
 {
-	self botClearWeaponOverride();
+	self botclearweaponoverride();
 }
 
 do_botweaponoverride( a )
 {
-	self botWeaponOverride( a );
+	self botweaponoverride( a );
 }
 
 do_botclearbuttonoverrides()
 {
-	self botClearButtonOverrides();
+	self botclearbuttonoverrides();
 }
 
 do_botaimoverride()
 {
-	self botAimOverride();
+	self botaimoverride();
 }
 
 do_botclearaimoverride()
 {
-	self botClearAimOverride();
+	self botclearaimoverride();
 }
 
 do_getfunction( a, b )
 {
-	return getFunction( a, b );
+	return getfunction( a, b );
 }
 
 do_replacefunc( a, b )
 {
-	return replaceFunc( a, b );
+	return replacefunc( a, b );
 }
 
 do_disabledetouronce( a )
@@ -90,10 +90,10 @@ do_disabledetouronce( a )
 
 do_botmeleeparams( entNum, dist )
 {
-	// self BotMeleeParams( entNum, dist );
+	// self botmeleeparams( entNum, dist );
 }
 
 do_clearbotmeleeparams()
 {
-	// self botClearMeleeParams();
+	// self botclearmeleeparams();
 }
