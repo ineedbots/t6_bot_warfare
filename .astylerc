@@ -1,5 +1,5 @@
 # try to mimic the original gsc provided
-# ghc
+# mode=ghc
 mode=c
 style=allman
 
@@ -9,7 +9,7 @@ lineend=windows
 pad-oper
 pad-paren-in
 pad-header
-# pad-brackets # adds outer bracket spaces... only want inner spaces
+# pad-brackets-in
 fill-empty-lines
 squeeze-lines=2
 squeeze-ws
