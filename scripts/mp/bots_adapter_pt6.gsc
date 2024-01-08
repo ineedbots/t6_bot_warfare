@@ -25,7 +25,7 @@ do_printconsole( s )
 
 do_botmovementoverride( a, b )
 {
-	self botmovementoverride( a, b );a
+	self botmovementoverride( a, b );
 }
 
 do_botclearmovementoverride()
