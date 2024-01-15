@@ -16,4 +16,4 @@ jobs:
 
       - name: Compile test script
         run: |
-          gsc-tool.exe comp t6 pc .
+          gsc-tool.exe -m comp -g t6 -s pc .
