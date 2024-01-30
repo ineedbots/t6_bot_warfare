@@ -90,10 +90,10 @@ do_disabledetouronce( a )
 
 do_botmeleeparams( entNum, dist )
 {
-	// self botmeleeparams( entNum, dist );
+	self botmeleeparams( entNum, dist );
 }
 
 do_clearbotmeleeparams()
 {
-	// self botclearmeleeparams();
+	self botclearmeleeparams();
 }
