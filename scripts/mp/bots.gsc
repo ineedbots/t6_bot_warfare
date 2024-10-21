@@ -1,113 +1,113 @@
 /*
-	_bot
-	Author: INeedGames
-	Date: 06/19/2021
-	The entry point and manager of the bots.
+	_机器人
+	添加作者一名
+	日期：2021年6月19日
+	机器人的入口点和管理者。
 */
 
-#include maps\mp\gametypes\_globallogic_utils;
-#include maps\mp\_utility;
-#include common_scripts\utility;
+#include 地图\mp\gametypes\_globallogic_utils;
+#include 地图\mp\_utility;
+#include common_scripts\实用程序；
 
 /*
-	Replace func stuff
+	替换功能性的东西
 */
-main()
+主要的（）
 {
 	level.bw_version = "1.1.1";
 	
 	if ( getdvar( "bots_main" ) == "" )
 	{
-		setdvar( "bots_main", true );
+		setdvar(“bots_main”, true );
 	}
 	
 	if ( !getdvarint( "bots_main" ) )
 	{
-		return;
+		返回；
 	}
 	
-	if ( !wait_for_builtins() )
+	如果（！wait_for_builtins（））
 	{
-		println( "FATAL: NO BUILT-INS FOR BOTS" );
+		println( "致命：没有内置机器人" );
 	}
 	
-	// fix bot grenade launcher usage
+	// 修复机器人手榴弹发射器的使用
 	BotBuiltinReplaceFunc( BotBuiltinGetFunction( "maps/mp/bots/_bot_combat", "bot_should_hip_fire" ), ::bot_should_hip_fire_replaced );
 }
 
 /*
-	Entry point to the bots
+	机器人的入口点
 */
-init()
+初始化（）
 {
 	if ( !getdvarint( "bots_main" ) )
 	{
-		return;
+		返回；
 	}
 	
-	if ( !wait_for_builtins() )
+	如果（！wait_for_builtins（））
 	{
-		println( "FATAL: NO BUILT-INS FOR BOTS" );
+		println( "致命：没有内置机器人" );
 	}
 	
 	if ( getdvar( "bots_main_GUIDs" ) == "" )
 	{
-		setdvar( "bots_main_GUIDs", "" ); // guids of players who will be given host powers, comma seperated
+		setdvar(“bots_main_GUIDs”,“”); // 将被赋予主机权力的玩家的指南，分隔分隔
 	}
 	
 	if ( getdvar( "bots_main_firstIsHost" ) == "" )
 	{
-		setdvar( "bots_main_firstIsHost", false ); // first play to connect is a host
+		setdvar(“bots_main_firstIsHost”, false ); //首先连接的是主机
 	}
 	
 	if ( getdvar( "bots_main_kickBotsAtEnd" ) == "" )
 	{
-		setdvar( "bots_main_kickBotsAtEnd", false ); // kicks the bots at game end (dedis hang with bots on map rotate)
+		setdvar(“bots_main_kickBotsAtEnd”, false ); // 在游戏结束时踢机器人（dedis 与地图旋转上的机器人一起挂起）
 	}
 	
 	if ( getdvar( "bots_main_waitForHostTime" ) == "" )
 	{
-		setdvar( "bots_main_waitForHostTime", 10.0 ); // how long to wait to wait for the host player
+		setdvar(“bots_main_waitForHostTime”, 10.0); // 等待主机玩家需要多长时间
 	}
 	
 	if ( getdvar( "bots_manage_add" ) == "" )
 	{
-		setdvar( "bots_manage_add", 0 ); // amount of bots to add to the game
+		setdvar(“bots_manage_add”, 0); //添加到游戏中的机器人数量
 	}
 	
 	if ( getdvar( "bots_manage_fill" ) == "" )
 	{
-		setdvar( "bots_manage_fill", 0 ); // amount of bots to maintain
+		setdvar(“bots_manage_fill”, 0); // 需要维护的机器人数量
 	}
 	
 	if ( getdvar( "bots_manage_fill_spec" ) == "" )
 	{
-		setdvar( "bots_manage_fill_spec", true ); // to count for fill if player is on spec team
+		setdvar(“bots_manage_fill_spec”, true ); // 如果玩家在规格团队中，则计算填充数
 	}
 	
 	if ( getdvar( "bots_manage_fill_mode" ) == "" )
 	{
-		setdvar( "bots_manage_fill_mode", 0 ); // fill mode, 0 adds everyone, 1 just bots, 2 maintains at maps, 3 is 2 with 1
+		setdvar(“bots_manage_fill_mode”, 0); // 填充模式，0添加所有权，1只是机器人，2维持在地图上，3是2加1
 	}
 	
 	if ( getdvar( "bots_manage_fill_kick" ) == "" )
 	{
-		setdvar( "bots_manage_fill_kick", false ); // kick bots if too many
+		setdvar(“bots_manage_fill_kick”, false ); // 如果机器人太多则踢掉机器人
 	}
 	
-	if ( getdvar( "bots_skill" ) == "" ) // alias for bot_difficulty
+	if ( getdvar( "bots_skill" ) == "" ) // bot_difficulty 的别名
 	{
-		setdvar( "bots_skill", "" );
+		setdvar(“bots_skill”,“”);
 	}
 	
 	if ( getdvar( "bots_team" ) == "" )
 	{
-		setdvar( "bots_team", "autoassign" ); // which team for bots to join
+		setdvar(“bots_team”,“自动分配”); // 机器人要加入哪个团队
 	}
 	
 	if ( getdvar( "bots_team_amount" ) == "" )
 	{
-		setdvar( "bots_team_amount", 0 ); // amount of bots on axis team
+		setdvar(“bots_team_amount”, 0); // 轴团队中的机器人数量
 	}
 	
 	if ( getdvar( "bots_team_force" ) == "" )
@@ -122,12 +122,12 @@ init()
 	
 	if ( getdvar( "bots_loadout_rank" ) == "" ) // what rank the bots should be around, -1 is around the players, 0 is all random
 	{
-		setdvar( "bots_loadout_rank", -1 );
+		setdvar( "bots_loadout_rank", 0 );
 	}
 	
 	if ( getdvar( "bots_loadout_prestige" ) == "" ) // what pretige the bots will be, -1 is the players, -2 is random
 	{
-		setdvar( "bots_loadout_prestige", -1 );
+		setdvar( "bots_loadout_prestige", -2 );
 	}
 	
 	if ( getdvar( "bots_play_nade" ) == "" )
