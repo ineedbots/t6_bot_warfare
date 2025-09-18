@@ -24,6 +24,7 @@ Bot Warfare is a GSC mod for the [PlutoniumT6 project](https://plutonium.pw/).
 | bots_main_waitForHostTime        | How many seconds to wait for the host player to connect before adding bots to the match.    | 10            |
 | bots_main_kickBotsAtEnd          | Kick the bots at the end of a match.                                                        | 0             |
 | bots_manage_add                  | Amount of bots to add to the game, once bots are added, resets back to `0`.                 | 0             |
+| bots_manage_fill_watchplayers    | Bots will not be added until one player is in the game                                      | 0             |
 | bots_manage_fill                 | Amount of players/bots (look at `bots_manage_fill_mode`) to maintain in the match.          | 0             |
 | bots_manage_fill_mode            | `bots_manage_fill` players/bots counting method.<ul><li>`0` - counts both players and bots.</li><li>`1` - only counts bots.</li></ul> | 0 |
 | bots_manage_fill_kick            | If the amount of players/bots in the match exceeds `bots_manage_fill`, kick bots until no longer exceeds. | 0     |
@@ -38,3 +39,4 @@ Bot Warfare is a GSC mod for the [PlutoniumT6 project](https://plutonium.pw/).
 | bots_play_nade                   | If the bots can grenade.                                                                       | 1          |
 | bots_play_jumpdrop               | If the bots can jump/drop shot.                                                                | 1          |
 | bots_play_aim                    | If the bots can aim.                                                                           | 1          |
+
