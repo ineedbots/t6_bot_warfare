@@ -500,7 +500,33 @@ diffBots()
 */
 bot_set_difficulty( difficulty )
 {
-	if ( difficulty == 3 )
+  if ( difficulty == 4 )
+	{
+		setdvar( "bot_MinDeathTime", "200" );
+		setdvar( "bot_MaxDeathTime", "400" );
+		setdvar( "bot_MinFireTime", "50" );
+		setdvar( "bot_MaxFireTime", "150" );
+		setdvar( "bot_PitchUp", "-3" );
+		setdvar( "bot_PitchDown", "5" );
+		setdvar( "bot_Fov", "180" );
+		setdvar( "bot_MinAdsTime", "1500" );
+		setdvar( "bot_MaxAdsTime", "2500" );
+		setdvar( "bot_MinCrouchTime", "50" );
+		setdvar( "bot_MaxCrouchTime", "200" );
+		setdvar( "bot_TargetLeadBias", "1" );
+		setdvar( "bot_MinReactionTime", "20" );
+		setdvar( "bot_MaxReactionTime", "50" );
+		setdvar( "bot_StrafeChance", "1" );
+		setdvar( "bot_MinStrafeTime", "1500" );
+		setdvar( "bot_MaxStrafeTime", "3000" );
+		setdvar( "scr_help_dist", "600" );
+		setdvar( "bot_AllowGrenades", "1" );
+		setdvar( "bot_MinGrenadeTime", "1000" );
+		setdvar( "bot_MaxGrenadeTime", "3000" );
+		setdvar( "bot_MeleeDist", "80" );
+		setdvar( "bot_YawSpeed", "2.5" );
+	}
+  else if ( difficulty == 3 )
 	{
 		setdvar( "bot_MinDeathTime", "250" );
 		setdvar( "bot_MaxDeathTime", "500" );
@@ -2710,4 +2736,5 @@ bot_sd_grenade() // checked changed to match cerberus output
 		}
 	}
 }
+
 
